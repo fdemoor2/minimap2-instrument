@@ -375,6 +375,8 @@ static void *worker_pipeline(void *shared, int step, void *in)
 
 mm_idx_t *mm_idx_gen(mm_bseq_file_t *fp, int w, int k, int b, int flag, int mini_batch_size, int n_threads, uint64_t batch_size)
 {
+	double _start = realtime();
+
 	pipeline_t pl;
 	if (fp == 0 || mm_bseq_eof(fp)) return 0;
 	memset(&pl, 0, sizeof(pipeline_t));
@@ -390,6 +392,8 @@ mm_idx_t *mm_idx_gen(mm_bseq_file_t *fp, int w, int k, int b, int flag, int mini
 	mm_idx_post(pl.mi, n_threads);
 	if (mm_verbose >= 3)
 		fprintf(stderr, "[M::%s::%.3f*%.2f] sorted minimizers\n", __func__, realtime() - mm_realtime0, cputime() / (realtime() - mm_realtime0));
+
+	fprintf(stderr, "[TIMING::%s] Took %.3f s to gen index\n", __func__, realtime() - _start);
 
 	return pl.mi;
 }

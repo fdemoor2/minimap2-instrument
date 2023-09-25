@@ -10,6 +10,10 @@
 #include "bseq.h"
 #include "khash.h"
 
+double _seed_timing = 0.0;
+double _chain_timing = 0.0;
+double _align_timing = 0.0;
+
 mm_tbuf_t *mm_tbuf_init(void)
 {
 	mm_tbuf_t *b;
@@ -226,6 +230,9 @@ static mm_reg1_t *align_regs(const mm_mapopt_t *opt, const mm_idx_t *mi, void *k
 
 void mm_map_frag(const mm_idx_t *mi, int n_segs, const int *qlens, const char **seqs, int *n_regs, mm_reg1_t **regs, mm_tbuf_t *b, const mm_mapopt_t *opt, const char *qname)
 {
+
+	double _start = realtime();
+
 	int i, j, rep_len, qlen_sum, n_regs0, n_mini_pos;
 	int max_chain_gap_qry, max_chain_gap_ref, is_splice = !!(opt->flag & MM_F_SPLICE), is_sr = !!(opt->flag & MM_F_SR);
 	uint32_t hash;
@@ -258,6 +265,8 @@ void mm_map_frag(const mm_idx_t *mi, int n_segs, const int *qlens, const char **
 			fprintf(stderr, "SD\t%s\t%d\t%c\t%d\t%d\t%d\n", mi->seq[a[i].x<<1>>33].name, (int32_t)a[i].x, "+-"[a[i].x>>63], (int32_t)a[i].y, (int32_t)(a[i].y>>32&0xff),
 					i == 0? 0 : ((int32_t)a[i].y - (int32_t)a[i-1].y) - ((int32_t)a[i].x - (int32_t)a[i-1].x));
 	}
+
+	_seed_timing += realtime() - _start; _start = realtime();
 
 	// set max chaining gap on the query and the reference sequence
 	if (is_sr)
@@ -335,6 +344,8 @@ void mm_map_frag(const mm_idx_t *mi, int n_segs, const int *qlens, const char **
 		n_regs0 = mm_filter_strand_retained(n_regs0, regs0);
 	}
 
+	_chain_timing += realtime() - _start; _start = realtime();
+
 	if (n_segs == 1) { // uni-segment
 		regs0 = align_regs(opt, mi, b->km, qlens[0], seqs[0], &n_regs0, regs0, a);
 		regs0 = (mm_reg1_t*)realloc(regs0, sizeof(*regs0) * n_regs0);
@@ -371,6 +382,8 @@ void mm_map_frag(const mm_idx_t *mi, int n_segs, const int *qlens, const char **
 			b->km = km_init();
 		}
 	}
+
+	_align_timing += realtime() - _start;
 }
 
 mm_reg1_t *mm_map(const mm_idx_t *mi, int qlen, const char *seq, int *n_regs, mm_tbuf_t *b, const mm_mapopt_t *opt, const char *qname)
@@ -611,6 +624,10 @@ static void *worker_pipeline(void *shared, int step, void *in)
 		if (mm_verbose >= 3)
 			fprintf(stderr, "[M::%s::%.3f*%.2f] mapped %d sequences\n", __func__, realtime() - mm_realtime0, cputime() / (realtime() - mm_realtime0), s->n_seq);
 		free(s);
+
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to seed\n", __func__, _seed_timing);
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to chain\n", __func__, _chain_timing);
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to align\n", __func__, _align_timing);
 	}
     return 0;
 }
