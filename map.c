@@ -10,9 +10,13 @@
 #include "bseq.h"
 #include "khash.h"
 
-double _seed_timing = 0.0;
-double _chain_timing = 0.0;
-double _align_timing = 0.0;
+double _align_timing = 0;
+double _chain_timing = 0;
+double _chain_bt_timing = 0;
+double _chain_bt_rmq_timing = 0;
+double _chain_dp_timing = 0;
+double _chain_dp_rmq_timing = 0;
+double _seed_timing = 0;
 
 mm_tbuf_t *mm_tbuf_init(void)
 {
@@ -628,6 +632,12 @@ static void *worker_pipeline(void *shared, int step, void *in)
 		fprintf(stderr, "[TIMING::%s] Took %.3f s to seed\n", __func__, _seed_timing);
 		fprintf(stderr, "[TIMING::%s] Took %.3f s to chain\n", __func__, _chain_timing);
 		fprintf(stderr, "[TIMING::%s] Took %.3f s to align\n", __func__, _align_timing);
+		fprintf(stderr, "---\n");
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to dp chain\n", __func__, _chain_dp_timing);
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to bt chain\n", __func__, _chain_bt_timing);
+		fprintf(stderr, "---\n");
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to dp rmq chain\n", __func__, _chain_dp_rmq_timing);
+		fprintf(stderr, "[TIMING::%s] Took %.3f s to bt rmq chain\n", __func__, _chain_bt_rmq_timing);
 	}
     return 0;
 }

@@ -165,7 +165,10 @@ mm128_t *mg_lchain_dp(int max_dist_x, int max_dist_y, int bw, int max_skip, int 
 	v = Kmalloc(km, int32_t, n);
 	t = Kcalloc(km, int32_t, n);
 
+	double _start;
+
 	// fill the score and backtrack arrays
+	_start = realtime();
 	for (i = 0, max_ii = -1; i < n; ++i) {
 		int64_t max_j = -1, end_j;
 		int32_t max_f = a[i].y>>32&0xff, n_skip = 0;
@@ -205,8 +208,12 @@ mm128_t *mg_lchain_dp(int max_dist_x, int max_dist_y, int bw, int max_skip, int 
 			max_ii = i;
 		if (mmax_f < max_f) mmax_f = max_f;
 	}
-
+	_chain_dp_timing += realtime() - _start;
+	
+	_start = realtime();
 	u = mg_chain_backtrack(km, n, f, p, v, t, min_cnt, min_sc, max_drop, &n_u, &n_v);
+	_chain_bt_timing += realtime() - _start;
+
 	*n_u_ = n_u, *_u = u; // NB: note that u[] may not be sorted by score here
 	kfree(km, p); kfree(km, f); kfree(km, t);
 	if (n_u == 0) {
@@ -271,7 +278,10 @@ mm128_t *mg_lchain_rmq(int max_dist, int max_dist_inner, int bw, int max_chn_ski
 	mem_mp = km_init2(km, 0x10000);
 	mp = kmp_init_rmq(mem_mp);
 
+	double _start;
+
 	// fill the score and backtrack arrays
+	_start = realtime();
 	for (i = i0 = 0; i < n; ++i) {
 		int64_t max_j = -1;
 		int32_t q_span = a[i].y>>32&0xff, max_f = q_span;
@@ -356,8 +366,12 @@ mm128_t *mg_lchain_rmq(int max_dist, int max_dist_inner, int bw, int max_chn_ski
 		if (max_rmq_size < krmq_size(head, root)) max_rmq_size = krmq_size(head, root);
 	}
 	km_destroy(mem_mp);
-
+	_chain_dp_rmq_timing += realtime() - _start;
+	
+	_start = realtime();
 	u = mg_chain_backtrack(km, n, f, p, v, t, min_cnt, min_sc, max_drop, &n_u, &n_v);
+	_chain_bt_rmq_timing += realtime() - _start;
+
 	*n_u_ = n_u, *_u = u; // NB: note that u[] may not be sorted by score here
 	kfree(km, p); kfree(km, f); kfree(km, t);
 	if (n_u == 0) {

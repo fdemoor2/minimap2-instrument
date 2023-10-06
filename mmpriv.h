@@ -37,6 +37,14 @@
 extern "C" {
 #endif
 
+extern double _seed_timing;
+extern double _chain_timing;
+extern double _chain_dp_timing;
+extern double _chain_dp_rmq_timing;
+extern double _chain_bt_timing;
+extern double _chain_bt_rmq_timing;
+extern double _align_timing;
+
 typedef struct {
 	uint32_t n;
 	uint32_t q_pos;

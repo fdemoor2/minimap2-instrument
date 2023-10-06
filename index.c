@@ -364,6 +364,15 @@ static void *worker_pipeline(void *shared, int step, void *in)
 			free(t->seq); free(t->name);
 		}
 		free(s->seq); s->seq = 0;
+		
+		// printf("Minimizers are ");
+		// for (int i = 0; i < s->a.n; i++) {
+		// 	mm128_t element = s->a.a[i];
+		// 	// hash value, rid (= seq id in database), position, strand
+		// 	printf("[%lu, %lu, %u, %ld] ", element.x >> 8, element.y >> 32, ((uint32_t) element.y) >> 1, element.y & 1);
+		// }
+		// printf("\n");
+		
 		return s;
     } else if (step == 2) { // dispatch sketch to buckets
         step_t *s = (step_t*)in;

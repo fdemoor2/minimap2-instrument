@@ -1,3 +1,17 @@
+## Profiling Minimap2
+
+Scripts to generate datasets and run the analysis can be found in the `profiling` folder:
+
+- `gen_datasets.sh`: downloads the reference genome and generates datasets (requires [Badread](https://github.com/rrwick/Badread) and [SimLoRD](https://bitbucket.org/genomeinformatics/simlord))
+- `minimap2_profiling.ipynb`: Jupyter notebook to run the analysis and plot the results
+
+
+---
+
+Original Minimap2 README follows.
+
+---
+
 [![GitHub Downloads](https://img.shields.io/github/downloads/lh3/minimap2/total.svg?style=social&logo=github&label=Download)](https://github.com/lh3/minimap2/releases)
 [![BioConda Install](https://img.shields.io/conda/dn/bioconda/minimap2.svg?style=flag&label=BioConda%20install)](https://anaconda.org/bioconda/minimap2)
 [![PyPI](https://img.shields.io/pypi/v/mappy.svg?style=flat)](https://pypi.python.org/pypi/mappy)
